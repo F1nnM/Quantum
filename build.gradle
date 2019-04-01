@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        google() // For Gradle 4.0+
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.0'
+    }
+}
+plugins {
+    id 'java'
+}
+
+group 'de.finnsweb.quantum'
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+group 'de.finnsweb.quantum'
+version '0.0.1'
+

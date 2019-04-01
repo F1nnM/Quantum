@@ -1,0 +1,9 @@
+rootProject.name = 'Quantum'
+
+include 'App'
+include 'ClientJava'
+include 'ServerJava'
+rootProject.name = 'Quantum'
+include 'ClientJava'
+include 'ServerJava'
+
