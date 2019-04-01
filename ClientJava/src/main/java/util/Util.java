@@ -78,7 +78,7 @@ public class Util {
         byte code = input[0];
         byte[] tmp = Arrays.copyOfRange(input, 1, input.length);
 
-        return new Result<>() {
+        return new Result<Byte, byte[]>() {
             @Override
             public Byte getKey() {
                 return code;
