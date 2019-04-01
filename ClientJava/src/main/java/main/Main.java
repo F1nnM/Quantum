@@ -13,5 +13,6 @@ public class Main {
         System.out.println(Hex.encodeHexString(Util.generateChecksum("abcdeg".getBytes())));
         SecureSocket s = new SecureSocket(null, null, "abc", "avc", null);
         s.connect();
+        //TEST
     }
 }
