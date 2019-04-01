@@ -82,11 +82,12 @@ public class Client {
         if (tmp.length == 2) { //Got username and password only
             //TODO Check username and password combo
             byte[] sid = new byte[12], did = new byte[12];
+            //TODO Send real sid and did
             Random r = new Random();
             r.nextBytes(sid);
             r.nextBytes(did);
 
-            send = enc.encryptByte(Util.concat(sid, Util.delimiterA, did));
+            send = enc.encryptByte(Util.concat(new byte[]{Util.ok}, sid, Util.delimiterA, did));
             out.writeInt(send.length);
             out.write(send);
             System.out.println("Sending sid " + Hex.encodeHexString(sid) + " and did " + Hex.encodeHexString(did));
@@ -96,7 +97,7 @@ public class Client {
             Random r = new Random();
             r.nextBytes(sid);
 
-            send = enc.encryptByte(sid);
+            send = enc.encryptByte(Util.concat(new byte[]{Util.ok}, sid));
             out.writeInt(send.length);
             out.write(send);
             System.out.println("Sending sid");

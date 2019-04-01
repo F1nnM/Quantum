@@ -4,6 +4,8 @@ import encryption.AESEncryption;
 import encryption.RSAEncryption;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import util.Result;
 import util.Util;
 
 import java.io.DataInputStream;
@@ -28,6 +30,10 @@ public class SecureSocket extends Socket {
     private DataInputStream in;
     private boolean run;
     private Thread t;
+
+    public static final int OK = 0;
+    public static final int WRONG_PASSWORD = 1;
+    public static final int CONNECTION_FAILED = 2;
 
     /**
      * @param deviceID      the ID of this Device, may be null
@@ -90,8 +96,12 @@ public class SecureSocket extends Socket {
         t.start();
     }
 
-    public void sendMessage(String user, byte[] message) {
-        //TODO Add this function to send messages
+    public void sendMessage(String user, byte[] message) throws IOException {
+        byte[] send = Util.concat(new byte[]{Util.sendTo}, user.getBytes(), Util.delimiterA, message);
+        out.writeInt(send.length);
+        out.write(send);
+
+
     }
 
     private void reconnect() throws IOException, GeneralSecurityException, InterruptedException {
@@ -147,7 +157,7 @@ public class SecureSocket extends Socket {
      * @throws InterruptedException     a
      * @throws GeneralSecurityException a
      */
-    private void firstConnect() throws IOException, InterruptedException, GeneralSecurityException {
+    private int firstConnect() throws IOException, InterruptedException, GeneralSecurityException {
         RSAEncryption rsaEncryption = new RSAEncryption(); //Initialize the RSA Encryption class in new thread for improved performance
         Thread thread = new Thread(() -> rsaEncryption.init(2048));
         thread.start();
@@ -215,12 +225,13 @@ public class SecureSocket extends Socket {
             in.close();
             this.close();
             enc = null;
-            return;
+            return CONNECTION_FAILED;
         } else System.out.println("Answer was correct");
 
         if (deviceID != null) //TODO add option for wrong username and password combo
-            send = Util.concat(username.getBytes(), Util.delimiterA, password.getBytes(), Util.delimiterA, deviceID);
-        else send = Util.concat(username.getBytes(), Util.delimiterA, password.getBytes());
+            send = Util.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes(), Util.delimiterA, deviceID);
+        else
+            send = Util.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes());
 
         send = enc.encryptByte(send);
         out.writeInt(send.length);
@@ -230,6 +241,17 @@ public class SecureSocket extends Socket {
         rec = new byte[in.readInt()];
         in.readFully(rec);
         rec = enc.decryptByte(rec);//Receive session ID and device ID, if needed
+
+        Result<Byte, byte[]> res = Util.getCode(rec);
+        rec = res.getValue();
+
+        if (res.getKey().equals(Util.wrongPassword)) {
+            //TODO Wrong Password
+            out.close();
+            in.close();
+            this.close();
+            return WRONG_PASSWORD;
+        }
 
         if (deviceID == null) { //Store session and device ID
             byte[][] dsid = Util.split(rec);
@@ -248,6 +270,7 @@ public class SecureSocket extends Socket {
         out.flush();
 
         System.out.println("Handshake successful");
+        return OK;
     }
 
     public byte[] getDeviceID() {

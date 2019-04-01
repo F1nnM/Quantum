@@ -17,6 +17,7 @@ public class Util {
     public static final byte wrongPassword = 0x4;
     public static final byte sendTo = 0x5;
     public static final byte endConnection = 0x6;
+    public static final byte error = 0x7;
 
     public static byte[] addCommand(byte command, byte[] toAddTo) throws IOException {
         return concat(new byte[]{command}, toAddTo);
@@ -33,6 +34,15 @@ public class Util {
         byteOs.close();
 
         return tmp;
+    }
+
+    public static boolean contains(Byte b, byte[] bytes) {
+        for (Byte b1 : bytes) {
+            if (b.equals(b1)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
