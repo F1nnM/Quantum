@@ -1,11 +1,14 @@
 package util;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class Util {
 
@@ -18,11 +21,50 @@ public class Util {
     public static final byte sendTo = 0x5;
     public static final byte endConnection = 0x6;
     public static final byte error = 0x7;
+    public static final byte getMessages = 0x8;
+    public static final byte getMessagesZip = 0x9;
+    public static final byte noNewMessages = 0xA;
 
     public static byte[] addCommand(byte command, byte[] toAddTo) throws IOException {
         return concat(new byte[]{command}, toAddTo);
     }
 
+    /**
+     * Unzips a byte array
+     *
+     * @param toUnzip the byte array to unzip
+     * @return the unzipped byte array
+     * @throws IOException an IOException if something does bot work
+     */
+    public static byte[] unzip(byte[] toUnzip) throws IOException {
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(toUnzip));
+        byte[] res = zis.readAllBytes();
+        zis.close();
+
+        return res;
+    }
+
+    /**
+     * Zips a byte array
+     *
+     * @param toZip the byte array to zip
+     * @return the zipped byte array
+     * @throws IOException an IOException if something does bot work
+     */
+    public static byte[] zip(byte[] toZip) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream zout = new ZipOutputStream(bout);
+        zout.write(toZip);
+        zout.flush();
+
+        byte[] res = bout.toByteArray();
+        zout.close();
+        bout.close();
+
+        return res;
+    }
+
+    @Deprecated
     public static byte[] concat(byte[]... byteArrays) throws IOException {
         ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
         for (byte[] arr : byteArrays) {

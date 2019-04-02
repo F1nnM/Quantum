@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/App/App.iml" filepath="$PROJECT_DIR$/App/App.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ClientJava/ClientJava.iml" filepath="$PROJECT_DIR$/ClientJava/ClientJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IdeaProjects.Quantum.iml" filepath="$PROJECT_DIR$/IdeaProjects.Quantum.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Quantum.iml" filepath="$PROJECT_DIR$/.idea/Quantum.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServerJava/ServerJava.iml" filepath="$PROJECT_DIR$/ServerJava/ServerJava.iml" />
+    </modules>
+  </component>
+</project>
