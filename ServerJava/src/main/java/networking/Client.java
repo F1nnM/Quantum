@@ -6,7 +6,9 @@ import encryption.RSAEncryption;
 import main.Main;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import util.Result;
+import util.Sql;
 import util.Util;
 
 import java.io.DataInputStream;
@@ -46,8 +48,12 @@ public class Client {
         } else if (res.getKey().equals(Util.restartConnection)) {
             restartConnection(res.getValue(), out, in, socket);
         } else {
-            //TODO Abort connection
+            out.close();
+            in.close();
+            socket.close();
         }
+
+        if (socket.isClosed()) return;
     }
 
     private void firstConnect(byte[] rsaKey, DataOutputStream out, DataInputStream in, Socket socket) throws GeneralSecurityException, IOException, DecoderException, InterruptedException {
@@ -81,17 +87,30 @@ public class Client {
         byte[][] tmp = Util.split(rec);
 
         if (tmp.length == 2) { //Got username and password only
-            //TODO Check username and password combo
-            byte[] sid = new byte[12], did = new byte[12];
-            //TODO Send real sid and did
-            Random r = new Random();
-            r.nextBytes(sid);
-            r.nextBytes(did);
+            Sql sql = new Sql();
+            if (BCrypt.checkpw(new String(tmp[1]), sql.getPasswordHash(new String(tmp[0])))) {
+                byte[] sid = new byte[12], did = new byte[12];
+                //TODO Send real sid and did
+                Random r = new Random();
+                r.nextBytes(sid);
+                r.nextBytes(did);
 
-            send = enc.encryptByte(Bytes.concat(new byte[]{Util.ok}, sid, Util.delimiterA, did));
-            out.writeInt(send.length);
-            out.write(send);
-            System.out.println("Sending sid " + Hex.encodeHexString(sid) + " and did " + Hex.encodeHexString(did));
+                send = enc.encryptByte(Bytes.concat(new byte[]{Util.ok}, sid, Util.delimiterA, did));
+                out.writeInt(send.length);
+                out.write(send);
+                System.out.println("Sending sid " + Hex.encodeHexString(sid) + " and did " + Hex.encodeHexString(did));
+            } else {
+                send = enc.encryptByte(new byte[]{Util.wrongPassword});
+                out.writeInt(send.length);
+                out.write(send);
+
+                out.close();
+                in.close();
+                socket.close();
+
+                System.out.println("Wrong password.");
+                return;
+            }
         } else {//Got username, password and deviceID
             //TODO Check username, password and deviceID combo
             byte[] sid = new byte[12];

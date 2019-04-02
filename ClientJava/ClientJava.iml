@@ -28,7 +28,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Gradle: commons-codec-1.12" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: spring-security-crypto-5.1.4.RELEASE" level="project" />
     <orderEntry type="library" exported="" name="Gradle: guava-27.1-jre" level="project" />
     <orderEntry type="library" exported="" name="Gradle: failureaccess-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: listenablefuture-9999.0-empty-to-avoid-conflict-with-guava" level="project" />
