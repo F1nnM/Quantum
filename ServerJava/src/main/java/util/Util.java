@@ -1,5 +1,7 @@
 package util;
 
+import com.google.common.primitives.Bytes;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,8 +27,8 @@ public class Util {
     public static final byte getMessagesZip = 0x9;
     public static final byte noNewMessages = 0xA;
 
-    public static byte[] addCommand(byte command, byte[] toAddTo) throws IOException {
-        return concat(new byte[]{command}, toAddTo);
+    public static byte[] addCommand(byte command, byte[] toAddTo) {
+        return Bytes.concat(new byte[]{command}, toAddTo);
     }
 
     /**
@@ -62,20 +64,6 @@ public class Util {
         bout.close();
 
         return res;
-    }
-
-    @Deprecated
-    public static byte[] concat(byte[]... byteArrays) throws IOException {
-        ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-        for (byte[] arr : byteArrays) {
-            byteOs.write(arr);
-        }
-
-        byteOs.flush();
-        byte[] tmp = byteOs.toByteArray();
-        byteOs.close();
-
-        return tmp;
     }
 
     public static boolean contains(Byte b, byte[] bytes) {

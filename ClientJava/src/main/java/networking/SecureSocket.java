@@ -174,7 +174,7 @@ public class SecureSocket extends Socket {
         System.out.println("Connected");
 
         System.out.println("Sending Session id");
-        byte[] send = serverEnc.encryptByte(Util.concat(new byte[]{Util.restartConnection}, sessionID));
+        byte[] send = serverEnc.encryptByte(Bytes.concat(new byte[]{Util.restartConnection}, sessionID));
         out.writeInt(send.length);
         out.write(send); //Send command to restart the connection and the sessionID
         out.flush();
@@ -192,7 +192,7 @@ public class SecureSocket extends Socket {
         }
 
         System.out.println("Sending login data");
-        send = enc.encryptByte(Util.concat(deviceID, Util.delimiterA, username.getBytes(), Util.delimiterA, password.getBytes()));
+        send = enc.encryptByte(Bytes.concat(deviceID, Util.delimiterA, username.getBytes(), Util.delimiterA, password.getBytes()));
         out.writeInt(send.length);
         out.write(send);//Authenticate by sending the device ID and the user's username and password
         out.flush();
@@ -290,9 +290,9 @@ public class SecureSocket extends Socket {
         } else System.out.println("Answer was correct");
 
         if (deviceID != null) //TODO add option for wrong username and password combo
-            send = Util.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes(), Util.delimiterA, deviceID);
+            send = Bytes.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes(), Util.delimiterA, deviceID);
         else
-            send = Util.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes());
+            send = Bytes.concat(username.getBytes(), Util.delimiterA, BCrypt.hashpw(password, BCrypt.gensalt()).getBytes());
 
         send = enc.encryptByte(send);
         out.writeInt(send.length);
