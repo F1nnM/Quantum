@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class Sql {
 
-    private static final String sqlUrl = "jdbc:mysql://h2718489.stratoserver.net/Quantum?user=QuantumServer&password=2hX69el$1Q^35vdh9@Q1g2gy";
+    private static final String sqlUrl = "jdbc:mysql://h2718489.stratoserver.net/Quantum";
 
     private static volatile Connection sqlInstance;
 
@@ -13,7 +13,7 @@ public class Sql {
             synchronized (Sql.class){
                 if (sqlInstance == null) {
                     try {
-                        sqlInstance = DriverManager.getConnection(sqlUrl);
+                        sqlInstance = DriverManager.getConnection(sqlUrl, Credentials.SQL_USER, Credentials.SQL_PASS);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
