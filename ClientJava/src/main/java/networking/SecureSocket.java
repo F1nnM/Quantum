@@ -115,6 +115,10 @@ public class SecureSocket extends Socket {
         }
     }
 
+    public void getMessages() {
+
+    }
+
     private void reconnect() throws IOException, GeneralSecurityException, InterruptedException {
         this.connect(new InetSocketAddress("localhost", 1234)); //TODO add port and ip
 
