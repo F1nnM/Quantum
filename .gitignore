@@ -89,3 +89,4 @@ fabric.properties
 ClientJava/build/
 ServerJava/build/
 .idea/caches/
+ServerJava/src/main/util/Credentials
