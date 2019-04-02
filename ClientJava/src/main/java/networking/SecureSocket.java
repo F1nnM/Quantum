@@ -6,7 +6,6 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import util.Result;
-import util.Util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
