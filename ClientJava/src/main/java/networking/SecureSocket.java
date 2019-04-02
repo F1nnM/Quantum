@@ -1,11 +1,13 @@
 package networking;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import encryption.AESEncryption;
 import encryption.RSAEncryption;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import util.Message;
 import util.Result;
 import util.Util;
 
@@ -17,6 +19,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -111,12 +114,55 @@ public class SecureSocket extends Socket {
             case Util.error:
                 return -1;//Something went wrong
             default:
-                return -2;//Blow up your house
+                return -2;//Blow up your house (not recommended)
         }
     }
 
-    public void getMessages() {
+    public Message[] getMessages(Timestamp timestamp) throws GeneralSecurityException, IOException, DecoderException {
+        byte[] tmp;
+        if (timestamp != null) {
+            tmp = enc.encryptByte(Bytes.concat(new byte[]{Util.getMessages}, Longs.toByteArray(timestamp.getTime())));//Get all new Messages after this timestamp
+        } else {
+            tmp = enc.encryptByte(Bytes.concat(new byte[]{Util.getMessages}, Longs.toByteArray(-1)));//Get all new Messages since the Big Bang
+        }
+        out.writeInt(tmp.length);
+        out.write(tmp);
+        out.flush();
 
+        tmp = new byte[in.readInt()];
+        in.readFully(tmp);
+        tmp = enc.decryptByte(tmp);
+
+        Result<Byte, byte[]> res = Util.getCode(tmp);
+        tmp = res.getValue();
+
+        switch (res.getKey()) {
+            case Util.getMessages: {
+                byte[][] msgb = Util.split(tmp);
+                Message[] msg = new Message[msgb.length];
+
+                for (int i = 0; i < msgb.length; i++) {
+                    msg[i] = new Message(msgb[i]);
+                }
+
+                return msg;
+            }
+            case Util.getMessagesZip: {
+                tmp = Util.unzip(tmp);
+                byte[][] msgb = Util.split(tmp);
+                Message[] msg = new Message[msgb.length];
+
+                for (int i = 0; i < msgb.length; i++) {
+                    msg[i] = new Message(msgb[i]);
+                }
+
+                return msg;
+            }
+            case Util.noNewMessages:
+                return new Message[0];
+            default:
+                return null;
+        }
     }
 
     private void reconnect() throws IOException, GeneralSecurityException, InterruptedException {
