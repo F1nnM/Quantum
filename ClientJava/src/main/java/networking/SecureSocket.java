@@ -1,11 +1,13 @@
 package networking;
 
+import com.google.common.primitives.Bytes;
 import encryption.AESEncryption;
 import encryption.RSAEncryption;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import util.Result;
+import util.Util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,6 +22,9 @@ import java.util.Random;
 
 public class SecureSocket extends Socket {
 
+    public static final int OK = 0;
+    public static final int WRONG_PASSWORD = 1;
+    public static final int CONNECTION_FAILED = 2;
     private AESEncryption enc;
     private RSAEncryption serverEnc;
     private String username, password;
@@ -29,10 +34,6 @@ public class SecureSocket extends Socket {
     private DataInputStream in;
     private boolean run;
     private Thread t;
-
-    public static final int OK = 0;
-    public static final int WRONG_PASSWORD = 1;
-    public static final int CONNECTION_FAILED = 2;
 
     /**
      * @param deviceID      the ID of this Device, may be null
@@ -95,11 +96,26 @@ public class SecureSocket extends Socket {
         t.start();
     }
 
-    public void sendMessage(String user, byte[] message) throws IOException {
-        byte[] send = Util.concat(new byte[]{Util.sendTo}, user.getBytes(), Util.delimiterA, message);
-        out.writeInt(send.length);
-        out.write(send);
+    public int sendMessage(String user, byte[] message) throws IOException, GeneralSecurityException {
+        byte[] tmp = enc.encryptByte(Bytes.concat(new byte[]{Util.sendTo}, user.getBytes(), Util.delimiterA, message));
+        out.writeInt(tmp.length);
+        out.write(tmp);
 
+        tmp = new byte[in.readInt()];
+        in.readFully(tmp);
+        tmp = enc.decryptByte(tmp);
+
+        switch (tmp[0]) {
+            case Util.ok:
+                return 0;//Everything ok
+            case Util.error:
+                return -1;//Something went wrong
+            default:
+                return -2;//Blow up your house
+        }
+    }
+
+    public void getMessages() {
 
     }
 
