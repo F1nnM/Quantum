@@ -1,5 +1,6 @@
 package networking;
 
+import com.google.common.primitives.Bytes;
 import encryption.AESEncryption;
 import encryption.RSAEncryption;
 import main.Main;
@@ -54,7 +55,7 @@ public class Client {
 
         System.out.println("Sending AES key");
         System.out.println("Checksum " + Hex.encodeHexString(Util.generateChecksum(rsaKey)));
-        byte[] send = new RSAEncryption(rsaKey, null).encryptByte(Util.concat(aesEncryption.getKey(), aesEncryption.getIv(), Util.generateChecksum(rsaKey)));
+        byte[] send = new RSAEncryption(rsaKey, null).encryptByte(Bytes.concat(aesEncryption.getKey(), aesEncryption.getIv(), Util.generateChecksum(rsaKey)));
         out.writeInt(send.length);
         out.write(send);
         out.flush();
@@ -87,7 +88,7 @@ public class Client {
             r.nextBytes(sid);
             r.nextBytes(did);
 
-            send = enc.encryptByte(Util.concat(new byte[]{Util.ok}, sid, Util.delimiterA, did));
+            send = enc.encryptByte(Bytes.concat(new byte[]{Util.ok}, sid, Util.delimiterA, did));
             out.writeInt(send.length);
             out.write(send);
             System.out.println("Sending sid " + Hex.encodeHexString(sid) + " and did " + Hex.encodeHexString(did));
@@ -97,7 +98,7 @@ public class Client {
             Random r = new Random();
             r.nextBytes(sid);
 
-            send = enc.encryptByte(Util.concat(new byte[]{Util.ok}, sid));
+            send = enc.encryptByte(Bytes.concat(new byte[]{Util.ok}, sid));
             out.writeInt(send.length);
             out.write(send);
             System.out.println("Sending sid");
